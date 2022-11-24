@@ -3,6 +3,12 @@
 # imports
 import socket
 import sys
+import requests
+
+# richiesta al server 
+def richiesta():
+    r = requests.get("http://localhost/wordpress")
+    print("Esito:",r.status_code)
 
 def comando(s):
     while True:
@@ -23,8 +29,11 @@ def connessione_server(indirizzo_server):
         
         # esco 
         sys.exit()
-        
-    # messaggio d'errore
+    
+    # faccio una richiesta al server
+    richiesta() 
+    
+    # messaggio 
     comando(s)
     
 # esecuzione passando il mio indirizzo locale
