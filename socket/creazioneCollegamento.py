@@ -2,25 +2,21 @@
 
 # imports
 import socket
-import subprocess
 import sys
+import requests
 
-def comandi(conn):
-    while True:
-        richiesta = conn.recv(4096)
-        risposta = subprocess.run(richiesta.decode(), shell = True, 
-                                  stdout = subprocess.PIPE,
-                                  stderr = subprocess.PIPE)
-        data = risposta.stdout + risposta.stderr
-        conn.send(data)
-    
-    
-def sub_server(indirizzo, backlog = 1): # connessioni ammesse
+# richiesta al server 
+def richiesta():
+    r = requests.get("http://localhost/wordpress")
+    print("Wordpress raggiunto correttamente:",r.status_code)
+       
+def sub_server(indirizzo): # connessioni ammesse
     try:
         s = socket.socket()
         s.bind(indirizzo)   # collegamento vero e proprio
-        s.listen(backlog)
+        s.listen()
         print("Server inizializzato correttamente")
+        richiesta()
     
     except socket.error as errore:
         print("Server non inizializzato")
@@ -28,11 +24,10 @@ def sub_server(indirizzo, backlog = 1): # connessioni ammesse
         sys.exit()
         
         
-    conn, indirizzo_client = s.accept()
+    s.accept()
     print("Connessione Client - Server stabilita")
-    comandi(conn)
     
 if __name__ == "__main__":
-    sub_server(("",80))
+    sub_server(("",8080))
     
     
