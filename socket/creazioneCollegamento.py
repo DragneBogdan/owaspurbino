@@ -22,11 +22,7 @@ def sub_server(indirizzo): # connessioni ammesse
         print("Server non inizializzato")
         print()
         sys.exit()
-        
-        
-    s.accept()
-    print("Connessione Client - Server stabilita")
-    
+            
 if __name__ == "__main__":
     sub_server(("",8080))
     
