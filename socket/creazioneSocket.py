@@ -9,7 +9,7 @@ def messaggio(s):
     while True:
         comando = input("-> ")
         if comando == "exit":
-            print("Connessione in corso...")
+            print("Disconnessione in corso...")
             s.close()
             sys.exit()
         
@@ -20,7 +20,7 @@ def messaggio(s):
 
 def richiesta():
     r = requests.get("http://localhost/wordpress")
-    print(r.status_code)
+    print("Wordpress raggiunto correttamente:",r.status_code)
   
 def connessione_server(indirizzo_server):
     try:
