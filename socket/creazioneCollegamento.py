@@ -8,7 +8,7 @@ import requests
 # richiesta al server 
 def richiesta():
     r = requests.get("http://localhost/wordpress")
-    print("Wordpress raggiunto correttamente:",r.status_code)
+    print("Esito:",r.status_code)
        
 def sub_server(indirizzo): # connessioni ammesse
     try:
