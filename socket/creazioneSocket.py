@@ -3,6 +3,7 @@
 # imports
 import socket
 import sys
+import requests
 
 def messaggio(s):
     while True:
@@ -16,12 +17,17 @@ def messaggio(s):
             s.send(comando.encode())
             data = s.recv(4096) # dimensione del buffer
             print(str(data,"utf-8"))
-    
+
+def richiesta():
+    r = requests.get("http://localhost/wordpress")
+    print(r.status_code)
+  
 def connessione_server(indirizzo_server):
     try:
         s = socket.socket() # creazione socket
         s.connect(indirizzo_server)
         print(f"Connessione al server {indirizzo_server} stabilita")
+        richiesta()
         
     except socket.error as errore:
         print(f"Connessione al server non riuscita")
