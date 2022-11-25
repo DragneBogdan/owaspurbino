@@ -38,5 +38,5 @@ def connessione_server(indirizzo_server):
     
 # esecuzione passando il mio indirizzo locale
 if __name__ == "__main__":
-    connessione_server(("192.168.1.51",80))
+    connessione_server(("localhost",80))
     
