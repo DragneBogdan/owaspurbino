@@ -7,8 +7,27 @@ import requests
 
 # richiesta al server 
 def richiesta():
-    r = requests.get("http://localhost/wordpress")
-    print("Esito:",r.status_code)
+  
+    count = 1
+    x = 0
+    num = 0
+    possibility = "infinite"
+    while(possibility == "infinite"):
+        count = count * 1000
+        for x in range(count):
+        
+            r = requests.get("http://localhost/wordpress")
+           
+            
+            num = num + 1
+
+            print("ho fatto", num, " richieste")
+            
+        if x > count:
+            possibility = "finite"
+        else:
+            possibility = "infinite"
+     
 
 def comando(s):
     while True:
