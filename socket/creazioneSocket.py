@@ -4,6 +4,7 @@
 import socket
 import sys
 import requests
+import time 
 
 # richiesta al server 
 def richiesta():
@@ -16,6 +17,7 @@ def comando(s):
         if comando == "exit":
             print("Disconnessione in corso...")
             s.close()
+            time.sleep(2)
             sys.exit()
         
 def connessione_server(indirizzo_server):
