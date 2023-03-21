@@ -10,7 +10,6 @@ def richiesta():
   
     r = requests.get("http://localhost/wordpress")
            
-            
 def comando(s):
     while True:
         comando = input("-> ")
