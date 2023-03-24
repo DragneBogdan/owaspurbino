@@ -7,20 +7,23 @@ import requests
 import time 
 from time import perf_counter
 import threading 
+from threading import Lock
 
 # def di thread - cosa fa il thread 
 def ex_thread():
     
     # il thread invoca per un certo numero di volte il metodo per fare richiesta
-    print("Processing...")
-    for i in range(1,10):
-        richiesta()
+    lock = Lock()
+    
+    try:
+        # acquisisco il lock 
+        lock.acquire()
         
-# richiesta al server 
-def richiesta():
-
-    r = requests.get("http://localhost/wordpress")
-           
+        print("Processing...")
+        r = requests.get("http://localhost/wordpress")
+    finally:
+        lock.release()
+        
 def comando(s):
     while True:
         comando = input("-> ")
@@ -42,8 +45,10 @@ def connessione_server(indirizzo_server):
         # esco 
         sys.exit()
     
+    n_THREAD = 800
     threads = []
-    for x in range(1,3):
+    i = 0
+    for x in range(1,n_THREAD):
         t = threading.Thread(target = ex_thread)
         
         # aggiungo il thread
@@ -51,6 +56,12 @@ def connessione_server(indirizzo_server):
         
         # avvio il thread
         t.start()
+        
+        i += 1
+        
+        # il thread aspetta un po' prima di fare un'altra richiesta
+        print("Richieste: ", i)
+        time.sleep(0.1) # 0.08 Crash
         
     # mi metto in attesa della loro terminazione 
     for th in threads:
@@ -62,4 +73,3 @@ def connessione_server(indirizzo_server):
 # esecuzione passando il mio indirizzo locale
 if __name__ == "__main__":
     connessione_server(("localhost",80))
-    
