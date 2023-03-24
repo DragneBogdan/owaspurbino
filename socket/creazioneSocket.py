@@ -7,7 +7,7 @@ import requests
 import time 
 from time import perf_counter
 import threading 
-from threading import Lock
+from threading import Thread, Lock
 
 # def di thread - cosa fa il thread 
 def ex_thread():
@@ -58,10 +58,8 @@ def connessione_server(indirizzo_server):
         t.start()
         
         i += 1
-        
-        # il thread aspetta un po' prima di fare un'altra richiesta
         print("Richieste: ", i)
-        time.sleep(0.1) # 0.08 Crash
+        time.sleep(0.3)
         
     # mi metto in attesa della loro terminazione 
     for th in threads:
@@ -73,3 +71,7 @@ def connessione_server(indirizzo_server):
 # esecuzione passando il mio indirizzo locale
 if __name__ == "__main__":
     connessione_server(("localhost",80))
+    
+    
+#https://www.digitalocean.com/community/tutorials/how-to-use-threadpoolexecutor-in-python-3
+    
