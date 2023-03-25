@@ -7,27 +7,20 @@ import requests
 import time 
 from time import perf_counter
 import threading 
-from threading import Lock
- 
+
+# variabile globale di incremento
+i = 0
+
 # def di thread - cosa fa il thread 
 def ex_thread():
     
-    # il thread invoca per un certo numero di volte il metodo per fare richiesta
-    lock = Lock()
+    global i 
     
-    try:
-        # acquisisco il lock 
-        lock.acquire()
-        
-        # calcolo il tempo 
+    # faccio una richiesta
+    print("Processing...")
+    r = requests.get("http://localhost/wordpress")
+    i += 1
     
-        print("Processing...")
-        r = requests.get("http://localhost/wordpress")
-        
-    finally:
-        # rilascio il lock 
-        lock.release()
-          
 # COMANDO 
 def comando(cmd):
     while True:
@@ -44,7 +37,6 @@ def comando(cmd):
         
 def connessione_server(indirizzo_server):
     try:
-        
         # creazione socket
         s = socket.socket()
         s.connect(indirizzo_server)
@@ -75,8 +67,7 @@ def acquisizione(s):
     
     # array di thread che effettuano la richiesta
     threads = []
-    i = 0
-    
+
     # il ciclo for inserisce i thread nell'array e li fa partire
     for x in range(0,n_THREAD):
         t = threading.Thread(target = ex_thread)
@@ -86,10 +77,6 @@ def acquisizione(s):
         
         # avvio il thread
         t.start()
-        
-        # incremento il numero di richieste 
-        i += 1
-        print("Richieste: ", i)
         
         # prima di fare un'altra richiesta attende un certo t
         time.sleep(time_To_sleep)
@@ -103,6 +90,7 @@ def acquisizione(s):
         
     stop = perf_counter()
     
+    print("Richieste fatte: ",i)
     print("Tempo impiegato: ",(stop - start))
         
     # ritorno ad acquisire il comando
