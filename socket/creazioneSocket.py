@@ -66,7 +66,7 @@ def acquisizione(s):
         n_THREAD = int(acquisizione)
         
         # acquisizione dell'intervallo di tempo 
-        acq_Time = input("Inserire l'intervallo di tempo(nel formato 0.#): ")
+        acq_Time = input("Inserire l'intervallo di tempo (nel formato 0.####): ")
         time_To_sleep = float(acq_Time)
         
     except:
@@ -113,8 +113,8 @@ if __name__ == "__main__":
     print("")
     print("Comandi:")
     print("--------")
-    print("Go: per avviare il programma")
-    print("exit: per uscire")
+    print("'go': per avviare il programma")
+    print("'exit': per uscire")
     print("")
     connessione_server(("localhost",80))
     
