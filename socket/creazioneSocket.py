@@ -7,19 +7,38 @@ import requests
 import time 
 from time import perf_counter
 import threading 
+from threading import Lock
 
-# variabile globale di incremento
+# variabile globale
 i = 0
 
 # def di thread - cosa fa il thread 
 def ex_thread():
     
+    # variabile globale
     global i 
     
-    # faccio una richiesta
-    print("Processing...")
-    r = requests.get("http://localhost/wordpress")
-    i += 1
+    # creo un lock
+    lock = Lock()
+    
+    try:
+        lock.acquire()
+        
+        # faccio una richiesta
+        print("Sending request...")
+        r = requests.get("http://localhost/wordpress")
+        
+        # se il server non risponde
+        if r.status_code != 200:
+      
+            # decremento il valore delle richieste
+            i -= 1
+            
+        else:
+        # incremento il valore delle richieste
+            i += 1
+    finally:
+        lock.release()
     
 # COMANDO 
 def comando(cmd):
@@ -58,8 +77,8 @@ def acquisizione(s):
         n_THREAD = int(acquisizione)
         
         # acquisizione dell'intervallo di tempo 
-        acq_Time = input("Inserire l'intervallo di tempo (nel formato 0.####): ")
-        time_To_sleep = float(acq_Time)
+        #acq_Time = input("Inserire l'intervallo di tempo (nel formato 0.####): ")
+        #time_To_sleep = float(acq_Time) 
         
     except:
         print("Inserire valori coerenti!")   
@@ -68,29 +87,32 @@ def acquisizione(s):
     # array di thread che effettuano la richiesta
     threads = []
 
+    # verifico quanto tempo ci impiegano per terminare 
+    start = perf_counter()
+    
     # il ciclo for inserisce i thread nell'array e li fa partire
     for x in range(0,n_THREAD):
-        t = threading.Thread(target = ex_thread)
         
+        t = threading.Thread(target = ex_thread)
+
         # aggiungo il thread
         threads.append(t)
         
         # avvio il thread
         t.start()
         
-        # prima di fare un'altra richiesta attende un certo t
-        time.sleep(time_To_sleep)
+        # prima di fare un'altra richiesta attende un certo t relativamente piccolo 
+        #time.sleep(time_To_sleep)
         
-    # verifico quanto tempo ci impiegano per terminare 
-    start = perf_counter()
-    
     # mi metto in attesa della loro terminazione 
     for th in threads:
         th.join()
-        
+      
+    # stop timer  
     stop = perf_counter()
     
-    print("Richieste fatte: ",i)
+    # messaggio
+    print("Richieste andate a buon fine: ",i)
     print("Tempo impiegato: ",(stop - start))
         
     # ritorno ad acquisire il comando
@@ -106,3 +128,4 @@ if __name__ == "__main__":
     print("")
     connessione_server(("localhost",80))
     
+# STAMPARE REPORT 
