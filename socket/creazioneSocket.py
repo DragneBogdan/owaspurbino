@@ -42,6 +42,9 @@ def ex_thread():
     
 # COMANDO 
 def comando(cmd):
+    
+    global i 
+    
     while True:
         comando = input("-> ")
         if comando == "exit":
@@ -52,6 +55,9 @@ def comando(cmd):
             
         # se il comando è go acquisisco i nuovamente i valori 
         if comando == "go":
+            
+            # reset dei valori 
+            i = 0
             acquisizione(cmd)
         
 def connessione_server(indirizzo_server):
