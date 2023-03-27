@@ -5,18 +5,28 @@ import socket
 import sys
 import requests
 import time 
-from time import perf_counter
 import threading 
 from threading import Lock
 
-# variabile globale
-i = 0
+# variabile globale che identifica il numero di risposte 200
+richiesteOk = 0
+
+# numero di richieste re-inviate 
+richiesteReinviate = 0
+
+# variabile che memorizza gli status complessivi 200
+totaleOk = 0
+
+# costante e variabile temporale 
+val_default = 0.10 # ogni 100 mili sec 
+time_To_sleep = val_default
 
 # def di thread - cosa fa il thread 
 def ex_thread():
     
     # variabile globale
-    global i 
+    global richiesteOk
+    global richiesteReinviate
     
     # creo un lock
     lock = Lock()
@@ -32,18 +42,25 @@ def ex_thread():
         if r.status_code != 200:
       
             # decremento il valore delle richieste
-            i -= 1
+            richiesteOk -= 1
             
+            # dormo relativamente poco e rifaccio la richiesta 
+            time.sleep(0.1)
+            rs = requests.get("http://localhost/wordpress")
+            
+            if rs.status_code == 200:
+               richiesteOk += 1
+               richiesteReinviate += 1
         else:
         # incremento il valore delle richieste
-            i += 1
+            richiesteOk += 1
     finally:
         lock.release()
     
 # COMANDO 
 def comando(cmd):
     
-    global i 
+    global richiesteOk
     
     while True:
         comando = input("-> ")
@@ -57,8 +74,8 @@ def comando(cmd):
         if comando == "go":
             
             # reset dei valori 
-            i = 0
-            acquisizione(cmd)
+            richiesteOk = 0
+            partenza_Thread(cmd)
         
 def connessione_server(indirizzo_server):
     try:
@@ -75,16 +92,12 @@ def connessione_server(indirizzo_server):
         # esco 
         sys.exit()
     
-def acquisizione(s):
+def partenza_Thread(s):
     try:
         
         # acquisizione del numero di richieste
         acquisizione = input("Inserire il numero di richieste: ")
         n_THREAD = int(acquisizione)
-        
-        # acquisizione dell'intervallo di tempo 
-        #acq_Time = input("Inserire l'intervallo di tempo (nel formato 0.####): ")
-        #time_To_sleep = float(acq_Time) 
         
     except:
         print("Inserire valori coerenti!")   
@@ -94,7 +107,7 @@ def acquisizione(s):
     threads = []
 
     # verifico quanto tempo ci impiegano per terminare 
-    start = perf_counter()
+    start = time.time()
     
     # il ciclo for inserisce i thread nell'array e li fa partire
     for x in range(0,n_THREAD):
@@ -107,18 +120,26 @@ def acquisizione(s):
         # avvio il thread
         t.start()
         
-        # prima di fare un'altra richiesta attende un certo t relativamente piccolo 
-        #time.sleep(time_To_sleep)
+        # tempo di attesa 
+        # time.sleep(time_To_sleep)
+        
+    # verifico com è la situazione 
+    totaleOk = richiesteOk + richiesteReinviate
+        
+    # se il totale è un certo valore v -> se è piccolo la simulazione termina se è grande
+    # allora conviene provare con un intervallo più ristretto cioè sempre lo stesso numero 
+    # di thread ma con un intervallo più piccolo
         
     # mi metto in attesa della loro terminazione 
     for th in threads:
         th.join()
       
     # stop timer  
-    stop = perf_counter()
+    stop = time.time()
     
     # messaggio
-    print("Richieste andate a buon fine: ",i)
+    print("Richieste andate a buon fine: ",richiesteOk)
+    print("Richieste re-inviate: ", richiesteReinviate)
     print("Tempo impiegato: ",(stop - start))
         
     # ritorno ad acquisire il comando
@@ -129,6 +150,7 @@ if __name__ == "__main__":
     print("")
     print("Comandi:")
     print("--------")
+    print("")
     print("'go': per avviare il programma")
     print("'exit': per uscire")
     print("")
