@@ -130,6 +130,8 @@ def calcola_Richieste():
     if coef >= 0.99:
         print("Coeff: ", (richiesteOk / inputRichieste))
         print("Risposte ok: ", richiesteOk)
+        
+        # setto a 0 le risposte ok dato che si ricomincia 
         richiesteOk = 0
         print("Si riparte")
         
