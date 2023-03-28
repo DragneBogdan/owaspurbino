@@ -129,6 +129,8 @@ def partenza_Thread(s):
     # se il totale è un certo valore v -> se è piccolo la simulazione termina se è grande
     # allora conviene provare con un intervallo più ristretto cioè sempre lo stesso numero 
     # di thread ma con un intervallo più piccolo
+    # se (n_THREAD = Richieste fatte) / totaleOk -> allora sono pervenute tutte 
+    # possiamo dire che più è vicino a 1 meglio è.
         
     # mi metto in attesa della loro terminazione 
     for th in threads:
