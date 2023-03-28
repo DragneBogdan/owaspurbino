@@ -63,6 +63,9 @@ def ex_thread():
 # Funzione che definisce come si interfaccia il programma all'utente
 def acquisizione_Comando():
     
+    # serve per resettare il numero di richieste
+    global inputRichieste
+    
     while True:
         comando = input("-> ")
         if comando == "exit":
@@ -72,6 +75,7 @@ def acquisizione_Comando():
             
         # se il comando è go acquisisco il programma va in esecuzione
         if comando == "go":
+            inputRichieste = 0
             acquisizione_Richieste()
         
 # Funzione che definisce la connessione al server
@@ -100,13 +104,13 @@ def acquisizione_Richieste():
     global inputRichieste
     
     try:
-        
         # acquisizione del numero di richieste
         acquisizione = input("Inserire il numero di richieste: ")
         inputRichieste = int(acquisizione)
-        
-        # posso far partire i thread
+            
+            # posso far partire i thread
         partenza_Thread()
+    
     except:
         
         # faccio reinseire i valori 
@@ -116,16 +120,28 @@ def acquisizione_Richieste():
 # Funzione che calcola le richieste con esito 200
 def calcola_Richieste():
     
-    # variabili globali 
-    global totaleOk, richiesteOk, richiesteReinviate
+    # variabili globali utili a calcolare le prestazioni 
+    global totaleOk, richiesteOk, richiesteReinviate, inputRichieste
     
-    # effettuo il calcolo per vedere il totale delle risposte andate a buon fine 
-    totaleOk = richiesteOk + richiesteReinviate    
+    # calcolo il coeff.
+    coef = (richiesteOk / inputRichieste)
     
-    # messaggi di output
-    print("Richieste andate a buon fine: ",totaleOk)
-    print("Richieste re-inviate: ", richiesteReinviate)
+    # se il coef supera è maggiore rispetto al valore soglia posso invocare nuovamente i thread
+    if coef >= 0.99:
+        print("Coeff: ", (richiesteOk / inputRichieste))
+        print("Risposte ok: ", richiesteOk)
+        richiesteOk = 0
+        print("Si riparte")
         
+        # invoca nuovamente i thread 
+        partenza_Thread()
+        
+    # se il coef. è inferiore al valore soglia la simulazione termina per evitare di mandare in crash il server 
+    else: 
+        print("SIMULAZIONE TERMINATA")
+        print("Coeff: ", (richiesteOk / inputRichieste))
+        print("Risposte ok: ", richiesteOk)
+                
 # Funzione che definisce la partenza dei thread in un ciclo 
 def partenza_Thread():
     
@@ -151,7 +167,7 @@ def partenza_Thread():
         t.start()
         
         # tempo di attesa tra una richiesta e l'altra
-        time.sleep(time_To_sleep)
+        # time.sleep(time_To_sleep)
         
     # mi metto in attesa della terminazione dei thread
     for th in threads:
@@ -160,7 +176,7 @@ def partenza_Thread():
     # stop timer - i thread sono finiti 
     stop = time.time()
     
-    # controllo il numero di richieste con esito 200
+    # valutazione delle prestazioni 
     calcola_Richieste()
     
     print("Tempo impiegato: ",(stop - start))
