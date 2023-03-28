@@ -8,23 +8,23 @@ import time
 import threading 
 from threading import Lock
 
-# variabile globale che identifica il numero di risposte 200
-richiesteOk = 0
+# ---------------------------- 
+# Variabili Globali per le richieste
 
-# numero di richieste re-inviate 
-richiesteReinviate = 0
+inputRichieste = 0      # variabile che memorizza il numero di richieste preso in input dall'utente
+richiesteOk = 0         # variabile che memorizza il numero di risposte con status 200
+richiesteReinviate = 0  # variabile che memorizza il numero di richieste re-inviate 
+totaleOk = 0            # variabile che memorizza la somma tra quelle re-inviate (con status 200) e le richiesteOk
 
-# variabile che memorizza gli status complessivi 200
-totaleOk = 0
+# -----------------------------
+# Variabili Globali per l'intervallo tra una richiesta e l'altra
+ 
+time_To_sleep = 0.10     # variabile sulla quale si agisce per diminuire l'intervallo
 
-# costante e variabile temporale 
-val_default = 0.10 # ogni 100 mili sec 
-time_To_sleep = val_default
-
-# def di thread - cosa fa il thread 
+# Funzione che definisce il comportamento di un thread
 def ex_thread():
     
-    # variabile globale
+    # variabili globali utilizzate 
     global richiesteOk
     global richiesteReinviate
     
@@ -32,130 +32,142 @@ def ex_thread():
     lock = Lock()
     
     try:
+        # acquisizione del lock devo essere in mutua esclusione poichè agisco su variabili condivise
         lock.acquire()
         
         # faccio una richiesta
         print("Sending request...")
         r = requests.get("http://localhost/wordpress")
         
-        # se il server non risponde
+        # incremento le richieste considerandola 200
+        richiesteOk += 1
+        
+        # se il server non risponde e restituisce 500
         if r.status_code != 200:
       
-            # decremento il valore delle richieste
+            # decremento il valore delle richieste precedentemente incrementato
             richiesteOk -= 1
             
-            # dormo relativamente poco e rifaccio la richiesta 
+            # dormo relativamente poco e provo a rifare la richiesta
             time.sleep(0.1)
             rs = requests.get("http://localhost/wordpress")
             
+            # se lo status è 200 incremento il contatore altrimenti rimane quello che e'
             if rs.status_code == 200:
-               richiesteOk += 1
+                
+               # aggiorno le richieste re-inviate 
                richiesteReinviate += 1
-        else:
-        # incremento il valore delle richieste
-            richiesteOk += 1
     finally:
         lock.release()
     
-# COMANDO 
-def comando(cmd):
-    
-    global richiesteOk
+# Funzione che definisce come si interfaccia il programma all'utente
+def acquisizione_Comando():
     
     while True:
         comando = input("-> ")
         if comando == "exit":
             print("Disconnessione in corso...")
-            cmd.close()
             time.sleep(0.2)
             sys.exit() 
             
-        # se il comando è go acquisisco i nuovamente i valori 
+        # se il comando è go acquisisco il programma va in esecuzione
         if comando == "go":
-            
-            # reset dei valori 
-            richiesteOk = 0
-            partenza_Thread(cmd)
+            acquisizione_Richieste()
         
+# Funzione che definisce la connessione al server
+# Prima si crea la socket e si tenta la connessione, se è stabilita continua l'esecuzione
+# altrimenti il programma termina con un messaggio d'errore
 def connessione_server(indirizzo_server):
+    
     try:
         # creazione socket
         s = socket.socket()
         s.connect(indirizzo_server)
         print(f"Connessione al server {indirizzo_server} stabilita")
 
-        # posso acquisire i valori
-        comando(s)
+        # continua l'esecuzione con l'acquisizione delle richieste
+        acquisizione_Comando()
     except socket.error as errore:
         print(f"Connessione al server non riuscita")
         
         # esco 
         sys.exit()
     
-def partenza_Thread(s):
+# Funzione che definisce i thread che effettuano la richiesta
+def acquisizione_Richieste():
+    
+    # variabile globale che memorizza il valore in input dell'utente
+    global inputRichieste
+    
     try:
         
         # acquisizione del numero di richieste
         acquisizione = input("Inserire il numero di richieste: ")
-        n_THREAD = int(acquisizione)
+        inputRichieste = int(acquisizione)
         
+        # posso far partire i thread
+        partenza_Thread()
     except:
+        
+        # faccio reinseire i valori 
         print("Inserire valori coerenti!")   
-        sys.exit
+        acquisizione_Richieste()
+
+# Funzione che calcola le richieste con esito 200
+def calcola_Richieste():
     
-    # array di thread che effettuano la richiesta
+    # variabili globali 
+    global totaleOk, richiesteOk, richiesteReinviate
+    
+    # effettuo il calcolo per vedere il totale delle risposte andate a buon fine 
+    totaleOk = richiesteOk + richiesteReinviate    
+    
+    # messaggi di output
+    print("Richieste andate a buon fine: ",totaleOk)
+    print("Richieste re-inviate: ", richiesteReinviate)
+        
+# Funzione che definisce la partenza dei thread in un ciclo 
+def partenza_Thread():
+    
+    # calcolo le richieste
+    global  inputRichieste
+    
+    # array di thread 
     threads = []
 
-    # verifico quanto tempo ci impiegano per terminare 
+    # partenza del timer
     start = time.time()
     
     # il ciclo for inserisce i thread nell'array e li fa partire
-    for x in range(0,n_THREAD):
+    for x in range(0,inputRichieste):
         
+        # inizializzare i thread che andranno ad invocare la funzione che li definisce
         t = threading.Thread(target = ex_thread)
 
         # aggiungo il thread
         threads.append(t)
         
-        # avvio il thread
+        # avvio i thread
         t.start()
         
-        # tempo di attesa 
-        # time.sleep(time_To_sleep)
+        # tempo di attesa tra una richiesta e l'altra
+        time.sleep(time_To_sleep)
         
-    # verifico com è la situazione 
-    totaleOk = richiesteOk + richiesteReinviate
-        
-    # se il totale è un certo valore v -> se è piccolo la simulazione termina se è grande
-    # allora conviene provare con un intervallo più ristretto cioè sempre lo stesso numero 
-    # di thread ma con un intervallo più piccolo
-    # se (n_THREAD = Richieste fatte) / totaleOk -> allora sono pervenute tutte 
-    # possiamo dire che più è vicino a 1 meglio è.
-        
-    # mi metto in attesa della loro terminazione 
+    # mi metto in attesa della terminazione dei thread
     for th in threads:
         th.join()
       
-    # stop timer  
+    # stop timer - i thread sono finiti 
     stop = time.time()
     
-    # messaggio
-    print("Richieste andate a buon fine: ",richiesteOk)
-    print("Richieste re-inviate: ", richiesteReinviate)
+    # controllo il numero di richieste con esito 200
+    calcola_Richieste()
+    
     print("Tempo impiegato: ",(stop - start))
-        
-    # ritorno ad acquisire il comando
-    comando(s)
-        
-# esecuzione passando il mio indirizzo locale
+    
+
+# MAIN
 if __name__ == "__main__":
-    print("")
-    print("Comandi:")
-    print("--------")
-    print("")
-    print("'go': per avviare il programma")
-    print("'exit': per uscire")
-    print("")
     connessione_server(("localhost",80))
     
 # STAMPARE REPORT 
