@@ -135,6 +135,9 @@ def calcola_Richieste():
         richiesteOk = 0
         print("Si riparte")
         
+        # raddoppio il numero di richieste 
+        inputRichieste *= 2
+        
         # invoca nuovamente i thread 
         partenza_Thread()
         
