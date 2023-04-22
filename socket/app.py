@@ -108,7 +108,7 @@ def acquisizione_Richieste():
         acquisizione = input("Inserire il numero di richieste: ")
         inputRichieste = int(acquisizione)
             
-            # posso far partire i thread
+        # posso far partire i thread
         partenza_Thread()
     
     except:
