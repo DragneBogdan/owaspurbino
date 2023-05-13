@@ -15,7 +15,7 @@ inputRichieste = 0      # variabile che memorizza il numero di richieste preso i
 richiesteOk = 0         # variabile che memorizza il numero di risposte con status 200
 richiesteReinviate = 0  # variabile che memorizza il numero di richieste re-inviate 
 totaleOk = 0            # variabile che memorizza la somma tra quelle re-inviate (con status 200) e le richiesteOk
-flag = True             # flag per far partire il timer solo una volta
+durataSimulazione = 0   # variabile che memorizza la durata intera della simulazione
 
 # -----------------------------
 # Variabili Globali per l'intervallo tra una richiesta e l'altra
@@ -122,7 +122,7 @@ def acquisizione_Richieste():
 def calcola_Richieste():
     
     # variabili globali utili a calcolare le prestazioni 
-    global totaleOk, richiesteOk, inputRichieste
+    global totaleOk, richiesteOk, inputRichieste, durataSimulazione
     
     # calcolo il coeff.
     coef = (richiesteOk / inputRichieste)
@@ -144,7 +144,9 @@ def calcola_Richieste():
         
     # se il coef. è inferiore al valore soglia la simulazione termina per evitare di mandare in crash il server 
     else: 
-        messaggio_Richieste()
+       messaggio_Richieste()
+       print("Tempo di durata della simulazione: ", durataSimulazione)
+       print("SIMULAZIONE TERMINATA")
     
 def messaggio_Richieste():
     print("Richieste con successo: ", richiesteOk)
@@ -155,22 +157,14 @@ def messaggio_Richieste():
 def partenza_Thread():
     
     # calcolo le richieste
-    global  inputRichieste
-    
-    # flag per far scattare il timer solo una volta
-    global flag 
+    global  inputRichieste, durataSimulazione
     
     # array di thread 
     threads = []
     
-    if flag == True:
-        
-        # partenza del timer
-        start = time.time()
-        
-        # metto il flag a false perchè il timer deve partire solo una volta 
-        flag = False
-    
+    # partenza del timer
+    start = time.time()
+            
      # faccio una richiesta
     print("Invio delle richieste in corso...")
     print("")
@@ -196,12 +190,11 @@ def partenza_Thread():
       
     # stop timer - i thread sono finiti 
     stop = time.time()
-        
+    
+    durataSimulazione += (stop - start)
+    
     # valutazione delle prestazioni 
     calcola_Richieste()
-    
-    print("Tempo di durata della simulazione: ", (stop - start))
-    print("SIMULAZIONE TERMINATA")
     
 # MAIN
 if __name__ == "__main__":
