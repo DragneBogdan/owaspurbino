@@ -15,6 +15,7 @@ inputRichieste = 0      # variabile che memorizza il numero di richieste preso i
 richiesteOk = 0         # variabile che memorizza il numero di risposte con status 200
 richiesteReinviate = 0  # variabile che memorizza il numero di richieste re-inviate 
 totaleOk = 0            # variabile che memorizza la somma tra quelle re-inviate (con status 200) e le richiesteOk
+contaSimulazione = 0    # variabile che memorizza il numero di simulazioni effettuate 
 
 # -----------------------------
 # Variabili Globali per l'intervallo tra una richiesta e l'altra
@@ -101,7 +102,7 @@ def acquisizione_Richieste():
     # variabile globale che memorizza il valore in input dell'utente
     global inputRichieste
     
-    try:
+    try:            
         # acquisizione del numero di richieste
         acquisizione = input("Inserire il numero di richieste: ")
         
@@ -152,14 +153,11 @@ def calcola_Richieste():
 def partenza_Thread():
     
     # calcolo le richieste
-    global  inputRichieste
+    global  inputRichieste, contaSimulazione
     
     # array di thread 
     threads = []
     
-    # array del tempo impiegato
-    tempo = []
-
     # partenza del timer
     start = time.time()
     
@@ -187,6 +185,9 @@ def partenza_Thread():
       
     # stop timer - i thread sono finiti 
     stop = time.time()
+    
+    print("Tempo impiegato per la ", contaSimulazione, "simulazione: ", (stop - start))
+    contaSimulazione += 1
     
     # valutazione delle prestazioni 
     calcola_Richieste()
