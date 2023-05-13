@@ -25,7 +25,7 @@ time_To_sleep = 0.10     # variabile sulla quale si agisce per diminuire l'inter
 def acquisizione_Comando():
     
     # serve per resettare il numero di richieste
-    global inputRichieste
+    global inputRichieste 
     
     while True:
         comando = input("-> ")
@@ -133,19 +133,20 @@ def calcola_Richieste():
         
         # setto a 0 le risposte ok dato che si ricomincia 
         richiesteOk = 0
-        print("Si riparte")
         
         # raddoppio il numero di richieste 
         inputRichieste *= 2
+        
+        print("Nuove richieste da effettuare: ", inputRichieste)
         
         # invoca nuovamente i thread 
         partenza_Thread()
         
     # se il coef. è inferiore al valore soglia la simulazione termina per evitare di mandare in crash il server 
     else: 
-        print("SIMULAZIONE TERMINATA")
         print("Coeff: ", (richiesteOk / inputRichieste))
         print("Risposte ok: ", richiesteOk)
+        print("SIMULAZIONE TERMINATA")
                 
 # Funzione che definisce la partenza dei thread in un ciclo 
 def partenza_Thread():
@@ -155,6 +156,9 @@ def partenza_Thread():
     
     # array di thread 
     threads = []
+    
+    # array del tempo impiegato
+    tempo = []
 
     # partenza del timer
     start = time.time()
@@ -186,8 +190,6 @@ def partenza_Thread():
     
     # valutazione delle prestazioni 
     calcola_Richieste()
-    
-    print("Tempo impiegato: ",(stop - start))
     
 # MAIN
 if __name__ == "__main__":
