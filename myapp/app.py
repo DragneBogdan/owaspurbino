@@ -20,7 +20,7 @@ flag = True             # flag per far partire il timer solo una volta
 # -----------------------------
 # Variabili Globali per l'intervallo tra una richiesta e l'altra
  
-time_To_sleep = 0.10     # variabile sulla quale si agisce per diminuire l'intervallo
+# time_To_sleep = 0.10     # variabile sulla quale si agisce per diminuire l'intervallo
 
 # Funzione che definisce come si interfaccia il programma all'utente
 def acquisizione_Comando():
@@ -122,14 +122,14 @@ def acquisizione_Richieste():
 def calcola_Richieste():
     
     # variabili globali utili a calcolare le prestazioni 
-    global totaleOk, richiesteOk, richiesteReinviate, inputRichieste
+    global totaleOk, richiesteOk, inputRichieste
     
     # calcolo il coeff.
     coef = (richiesteOk / inputRichieste)
     
     # se il coef è maggiore rispetto al valore soglia posso invocare nuovamente i thread
     if coef >= 0.99:
-        messaggioRichieste()
+        messaggio_Richieste()
         
         # setto a 0 le risposte ok dato che si ricomincia 
         richiesteOk = 0
@@ -144,9 +144,9 @@ def calcola_Richieste():
         
     # se il coef. è inferiore al valore soglia la simulazione termina per evitare di mandare in crash il server 
     else: 
-        messaggioRichieste()
+        messaggio_Richieste()
     
-def messaggioRichieste():
+def messaggio_Richieste():
     print("Richieste con successo: ", richiesteOk)
     print("Rapporto richieste avvenute/richieste effettuate: ", (richiesteOk / inputRichieste))
     print("")
@@ -155,7 +155,7 @@ def messaggioRichieste():
 def partenza_Thread():
     
     # calcolo le richieste
-    global  inputRichieste, contaSimulazione
+    global  inputRichieste
     
     # flag per far scattare il timer solo una volta
     global flag 
