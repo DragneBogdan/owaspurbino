@@ -104,7 +104,7 @@ def acquisizione_Richieste():
     
     try:            
         # acquisizione del numero di richieste
-        acquisizione = input("Inserire il numero di richieste: ")
+        acquisizione = input("Inserire il numero di richieste da effettuare: ")
         
         # salvo il valore
         inputRichieste = int(acquisizione)
@@ -115,8 +115,13 @@ def acquisizione_Richieste():
     except:
         
         # faccio reinseire i valori 
-        print("Inserire valori coerenti!")   
-        acquisizione_Richieste()
+        
+        if acquisizione == "exit":
+            sys.exit()
+        else:
+            print("Inserire valori coerenti oppure 'exit' per uscire")   
+            print("")
+            acquisizione_Richieste()
 
 # Funzione che calcola le richieste con esito 200
 def calcola_Richieste():
@@ -196,7 +201,15 @@ def partenza_Thread():
     # valutazione delle prestazioni 
     calcola_Richieste()
     
+def istruzioni():
+    print("")
+    print("--- TESTA LA TUA APPLICAZIONE ---")
+    print("'go' per avviare la simulazione")
+    print("'exit' per uscire dalla simulazione")
+    print("")
+    
 # MAIN
 if __name__ == "__main__":
+    istruzioni()
     connessione_server(("localhost",80))
     
