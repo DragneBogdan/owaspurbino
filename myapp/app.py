@@ -15,7 +15,7 @@ inputRichieste = 0      # variabile che memorizza il numero di richieste preso i
 richiesteOk = 0         # variabile che memorizza il numero di risposte con status 200
 richiesteReinviate = 0  # variabile che memorizza il numero di richieste re-inviate 
 totaleOk = 0            # variabile che memorizza la somma tra quelle re-inviate (con status 200) e le richiesteOk
-contaSimulazione = 0    # variabile che memorizza il numero di simulazioni effettuate 
+flag = True             # flag per far partire il timer solo una volta
 
 # -----------------------------
 # Variabili Globali per l'intervallo tra una richiesta e l'altra
@@ -129,8 +129,7 @@ def calcola_Richieste():
     
     # se il coef è maggiore rispetto al valore soglia posso invocare nuovamente i thread
     if coef >= 0.99:
-        print("Coeff: ", (richiesteOk / inputRichieste))
-        print("Risposte ok: ", richiesteOk)
+        messaggioRichieste()
         
         # setto a 0 le risposte ok dato che si ricomincia 
         richiesteOk = 0
@@ -145,24 +144,36 @@ def calcola_Richieste():
         
     # se il coef. è inferiore al valore soglia la simulazione termina per evitare di mandare in crash il server 
     else: 
-        print("Coeff: ", (richiesteOk / inputRichieste))
-        print("Risposte ok: ", richiesteOk)
-        print("SIMULAZIONE TERMINATA")
-                
+        messaggioRichieste()
+    
+def messaggioRichieste():
+    print("Richieste con successo: ", richiesteOk)
+    print("Rapporto richieste avvenute/richieste effettuate: ", (richiesteOk / inputRichieste))
+    print("")
+        
 # Funzione che definisce la partenza dei thread in un ciclo 
 def partenza_Thread():
     
     # calcolo le richieste
     global  inputRichieste, contaSimulazione
     
+    # flag per far scattare il timer solo una volta
+    global flag 
+    
     # array di thread 
     threads = []
     
-    # partenza del timer
-    start = time.time()
+    if flag == True:
+        
+        # partenza del timer
+        start = time.time()
+        
+        # metto il flag a false perchè il timer deve partire solo una volta 
+        flag = False
     
      # faccio una richiesta
-    print("Sending request...")
+    print("Invio delle richieste in corso...")
+    print("")
         
     # il ciclo for inserisce i thread nell'array e li fa partire
     for x in range(0,inputRichieste):
@@ -185,12 +196,12 @@ def partenza_Thread():
       
     # stop timer - i thread sono finiti 
     stop = time.time()
-    
-    print("Tempo impiegato per la ", contaSimulazione, "simulazione: ", (stop - start))
-    contaSimulazione += 1
-    
+        
     # valutazione delle prestazioni 
     calcola_Richieste()
+    
+    print("Tempo di durata della simulazione: ", (stop - start))
+    print("SIMULAZIONE TERMINATA")
     
 # MAIN
 if __name__ == "__main__":
