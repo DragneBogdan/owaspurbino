@@ -21,6 +21,24 @@ totaleOk = 0            # variabile che memorizza la somma tra quelle re-inviate
  
 time_To_sleep = 0.10     # variabile sulla quale si agisce per diminuire l'intervallo
 
+# Funzione che definisce come si interfaccia il programma all'utente
+def acquisizione_Comando():
+    
+    # serve per resettare il numero di richieste
+    global inputRichieste
+    
+    while True:
+        comando = input("-> ")
+        if comando == "exit":
+            print("Disconnessione in corso...")
+            time.sleep(0.2)
+            sys.exit() 
+            
+        # se il comando è go acquisisco il programma va in esecuzione
+        if comando == "go":
+            inputRichieste = 0
+            acquisizione_Richieste()
+            
 # Funzione che definisce il comportamento di un thread
 def ex_thread():
     
@@ -34,9 +52,7 @@ def ex_thread():
     try:
         # acquisizione del lock devo essere in mutua esclusione poichè agisco su variabili condivise
         lock.acquire()
-        
-        # faccio una richiesta
-        print("Sending request...")
+    
         r = requests.get("http://localhost/wordpress")
         
         # incremento le richieste considerandola 200
@@ -59,25 +75,7 @@ def ex_thread():
                richiesteReinviate += 1
     finally:
         lock.release()
-    
-# Funzione che definisce come si interfaccia il programma all'utente
-def acquisizione_Comando():
-    
-    # serve per resettare il numero di richieste
-    global inputRichieste
-    
-    while True:
-        comando = input("-> ")
-        if comando == "exit":
-            print("Disconnessione in corso...")
-            time.sleep(0.2)
-            sys.exit() 
             
-        # se il comando è go acquisisco il programma va in esecuzione
-        if comando == "go":
-            inputRichieste = 0
-            acquisizione_Richieste()
-        
 # Funzione che definisce la connessione al server
 # Prima si crea la socket e si tenta la connessione, se è stabilita continua l'esecuzione
 # altrimenti il programma termina con un messaggio d'errore
@@ -106,8 +104,10 @@ def acquisizione_Richieste():
     try:
         # acquisizione del numero di richieste
         acquisizione = input("Inserire il numero di richieste: ")
+        
+        # salvo il valore
         inputRichieste = int(acquisizione)
-            
+        
         # posso far partire i thread
         partenza_Thread()
     
@@ -126,7 +126,7 @@ def calcola_Richieste():
     # calcolo il coeff.
     coef = (richiesteOk / inputRichieste)
     
-    # se il coef supera è maggiore rispetto al valore soglia posso invocare nuovamente i thread
+    # se il coef è maggiore rispetto al valore soglia posso invocare nuovamente i thread
     if coef >= 0.99:
         print("Coeff: ", (richiesteOk / inputRichieste))
         print("Risposte ok: ", richiesteOk)
@@ -159,6 +159,9 @@ def partenza_Thread():
     # partenza del timer
     start = time.time()
     
+     # faccio una richiesta
+    print("Sending request...")
+        
     # il ciclo for inserisce i thread nell'array e li fa partire
     for x in range(0,inputRichieste):
         
@@ -186,9 +189,7 @@ def partenza_Thread():
     
     print("Tempo impiegato: ",(stop - start))
     
-
 # MAIN
 if __name__ == "__main__":
     connessione_server(("localhost",80))
     
-# STAMPARE REPORT 
