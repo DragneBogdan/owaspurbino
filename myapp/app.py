@@ -127,10 +127,10 @@ def acquisizione_Richieste():
 def calcola_Richieste():
     
     # variabili globali utili a calcolare le prestazioni 
-    global totaleOk, richiesteOk, inputRichieste, durataSimulazione
+    global totaleOk, richiesteOk, inputRichieste, durataSimulazione, richiesteReinviate
     
     # calcolo il coeff.
-    coef = (richiesteOk / inputRichieste)
+    coef = ((richiesteOk + richiesteReinviate) / inputRichieste)
     
     # se il coef è maggiore rispetto al valore soglia posso invocare nuovamente i thread
     if coef >= 0.99:
@@ -144,6 +144,9 @@ def calcola_Richieste():
         
         print("Nuove richieste da effettuare: ", inputRichieste)
         
+        # tempo di attesa tra una richiesta e l'altra
+        # time.sleep(time_To_sleep)
+        
         # invoca nuovamente i thread 
         partenza_Thread()
         
@@ -154,8 +157,8 @@ def calcola_Richieste():
        print("SIMULAZIONE TERMINATA")
     
 def messaggio_Richieste():
-    print("Richieste con successo: ", richiesteOk)
-    print("Rapporto richieste avvenute/richieste effettuate: ", (richiesteOk / inputRichieste))
+    print("Richieste con successo: ", richiesteOk + richiesteReinviate)
+    print("Rapporto richieste avvenute/richieste effettuate: ", ((richiesteOk + richiesteReinviate)/ inputRichieste))
     print("")
         
 # Funzione che definisce la partenza dei thread in un ciclo 
@@ -185,9 +188,6 @@ def partenza_Thread():
         
         # avvio i thread
         t.start()
-        
-        # tempo di attesa tra una richiesta e l'altra
-        # time.sleep(time_To_sleep)
         
     # mi metto in attesa della terminazione dei thread
     for th in threads:
