@@ -16,7 +16,7 @@ Per utilizzare il tool è sufficiente inserire la chiave di avvio 'go' altriment
 
 ### L'algoritmo 
 
-#### Avvio del programma (Interfaccia utente) 
+#### Input
 All'avvio del programma, si tenta di effettuare la connessione al server, in questo caso la porta corrispondendte è la PORTA 80 ovvero la porta dedicata al server Web (HTTP).
 Se la connessione al server non è riuscita allora l'esecuzione termina altrimenti prosegue in attesa della parola chiave "go" per avviare le richieste altrimenti "exit" per uscire dal programma.
 Quando il programma richiede il numero di richieste da effettuare si aspetta un numero intero - positivo altrimenti chiede il reinserimento oppure "exit" per uscire.
